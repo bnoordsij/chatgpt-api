@@ -2,22 +2,29 @@
 
 namespace Bnoordsij\ChatgptApi\Laravel;
 
+use Bnoordsij\ChatgptApi\Api\Client;
+use Bnoordsij\ChatgptApi\Contracts\Api\Client as ClientContract;
 use Illuminate\Support\ServiceProvider;
 
 class ChatgptApiServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        //
+        $this->publishes([
+            __DIR__.'/../../config/chatgpt-api.php' => config_path('chatgpt-api.php'),
+        ], 'chatgpt-api');
     }
 
     public function register()
     {
-        $this->app->scoped(ClientContract::class, function (): Client {
-            $config = config('services.chatgpt');
+        $this->mergeConfigFrom(__DIR__.'/../../config/chatgpt-api.php', 'chatgpt-api');
+
+        $this->app->singleton(ClientContract::class, function (): Client {
+            $config = config('chatgpt-api.chatgpt');
+
             return new Client(
                 $config['base_url'],
-                $config['key'],
+                $config['api_key'],
                 $config['model'],
             );
         });

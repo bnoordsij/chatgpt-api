@@ -15,9 +15,9 @@ final class Client implements ClientInterface
     {
     }
 
-    public function getResponse(string $prompt, int $tokens):?string
+    public function getResponse(string $prompt, int $tokens)
     {
-        $this->call($prompt, $tokens);
+        return $this->call($prompt, $tokens);
     }
 
     private function call(string $prompt, int $tokens):?string
