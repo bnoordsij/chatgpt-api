@@ -25,7 +25,7 @@
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
-            "Carbon\\": "src/ChatgptApi/"
+            "Bnoordsij\\ChatgptApi\\": "src/"
         }
     },
     "extra": {
