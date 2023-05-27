@@ -35,7 +35,7 @@
         },
         "laravel": {
             "providers": [
-                "Bnoordsij\\ChatgptApi\\Laravel\\ServiceProvider"
+                "Bnoordsij\\ChatgptApi\\Laravel\\ChatgptApiServiceProvider"
             ]
         }
     }
