@@ -8,6 +8,19 @@ class ChatgptApiServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        // nothing yet
+        //
+    }
+
+    public function register()
+    {
+        $this->app->scoped(ClientContract::class, function (): Client {
+            $config = config('services.chatgpt');
+            return new Client(
+                $config['base_url'],
+                $config['key'],
+                $config['model'],
+            );
+        });
+
     }
 }
