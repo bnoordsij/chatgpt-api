@@ -3,7 +3,7 @@
 namespace Bnoordsij\ChatgptApi\Api;
 
 use Illuminate\Support\Facades\Http;
-use Bnoordsij\ChatgptApi\Contract\Api\Client as ClientInterface;
+use Bnoordsij\ChatgptApi\Contracts\Api\Client as ClientInterface;
 
 final class Client implements ClientInterface
 {
