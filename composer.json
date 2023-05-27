@@ -1,0 +1,42 @@
+{
+    "name": "bnoordsij/chatgpt-api",
+    "description": "A wrapper around the ChatGPT API to return data in specific formats",
+    "license": "MIT",
+    "type": "library",
+    "keywords": [
+        "ChatGPT",
+        "API"
+    ],
+    "authors": [
+        {
+            "name": "Bart Noordsij",
+            "homepage": "https://github.com/bnoordsij"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "ext-json": "*",
+        "guzzlehttp/guzzle": "^7.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5.20"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "Carbon\\": "src/ChatgptApi/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-3.x": "3.x-dev",
+            "dev-master": "2.x-dev"
+        },
+        "laravel": {
+            "providers": [
+                "Bnoordsij\\ChatgptApi\\Laravel\\ServiceProvider"
+            ]
+        }
+    }
+}
