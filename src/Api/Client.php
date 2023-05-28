@@ -2,9 +2,11 @@
 
 namespace Bnoordsij\ChatgptApi\Api;
 
-use Illuminate\Support\Facades\Http;
-use Bnoordsij\ChatgptApi\Exceptions\InvalidRequestException;
 use Bnoordsij\ChatgptApi\Contracts\Api\Client as ClientInterface;
+use Bnoordsij\ChatgptApi\Exceptions\InvalidOutputException;
+use Bnoordsij\ChatgptApi\Exceptions\InvalidRequestException;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Http;
 
 final class Client implements ClientInterface
 {
@@ -14,6 +16,23 @@ final class Client implements ClientInterface
         private string $model,
     )
     {
+    }
+
+    // later this should be an interface of Wrapper
+    public function duplicateJson(Model $model, string $question)
+    {
+        $exampleJson = $model->toJsonResponse();
+        $json = json_encode([$exampleJson, ['title' => '...']]);
+        $messages = [
+            ['role' => 'system', 'content' => 'You return all your responses in JSON like: ' . $json],
+//            ['role' => 'user', 'content' => $initialQuestion],
+//            ['role' => 'assistant', 'content' => $json],
+            ['role' => 'user', 'content' => $question],
+        ];
+
+//        dd('$messages', $messages);
+
+        return $this->getConversation($messages);
     }
 
     /*
@@ -28,7 +47,6 @@ final class Client implements ClientInterface
         $data = [
             'model' => 'gpt-3.5-turbo',
             'messages' => $messages,
-//            'max_tokens' => $tokens,
         ];
 
         return $this->call('chat/completions', $data)[0]['message']['content'] ?? null;
@@ -58,8 +76,6 @@ final class Client implements ClientInterface
 
         $url = 'https://api.openai.com/v1/' . $endpoint;
 
-        dump(['$data', $data]);
-
         // @todo switch to guzzle client
         $response = Http::withHeaders($headers)->post($url, $data);
 
@@ -73,6 +89,6 @@ final class Client implements ClientInterface
             throw new InvalidRequestException('Error: ' . json_encode($json));
         }
 
-        return $json['choices'] ?? [];
+        return $json['choices'] ?? throw new InvalidOutputException('Error: ' . json_encode($json));;
     }
 }
