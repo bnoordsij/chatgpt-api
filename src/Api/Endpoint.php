@@ -3,11 +3,12 @@
 namespace Bnoordsij\ChatgptApi\Api;
 
 use Bnoordsij\ChatgptApi\Contracts\Api\Client as ClientInterface;
+use Bnoordsij\ChatgptApi\Contracts\Api\Endpoint as EndpointContract;
 use Bnoordsij\ChatgptApi\Exceptions\InvalidRequestException;
 use Bnoordsij\ChatgptApi\ExtractData\ExtractJson;
 use Illuminate\Support\Str;
 
-class Endpoint
+class Endpoint implements EndpointContract
 {
     public function __construct(private ClientInterface $client)
     {

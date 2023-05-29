@@ -47,6 +47,20 @@ class ExtractJson extends AbstractExtractData
             ->filter()
             ->map(function (string|array $line) {
                 if (is_string($line)) {
+                    $data = json_decode($line, true);
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        return $data;
+                    }
+
+                    $substr = substr($line, 0, 2);
+                    if ($substr === '"{' || $substr === '"[') {
+                        $line = substr($line, 1);
+                    }
+                    $data = json_decode($line, true);
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        return $data;
+                    }
+
                     return $line;
                 }
 

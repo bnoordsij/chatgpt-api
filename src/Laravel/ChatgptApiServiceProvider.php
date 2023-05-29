@@ -3,7 +3,9 @@
 namespace Bnoordsij\ChatgptApi\Laravel;
 
 use Bnoordsij\ChatgptApi\Api\Client;
+use Bnoordsij\ChatgptApi\Api\Endpoint;
 use Bnoordsij\ChatgptApi\Contracts\Api\Client as ClientContract;
+use Bnoordsij\ChatgptApi\Contracts\Api\Endpoint as EndpointContract;
 use Illuminate\Support\ServiceProvider;
 
 class ChatgptApiServiceProvider extends ServiceProvider
@@ -29,5 +31,8 @@ class ChatgptApiServiceProvider extends ServiceProvider
             );
         });
 
+        $this->app->singleton(EndpointContract::class, function (): Endpoint {
+           return new Endpoint($this->app->make(ClientContract::class));
+        });
     }
 }
