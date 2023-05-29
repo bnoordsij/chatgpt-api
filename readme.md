@@ -7,37 +7,54 @@ I have experimented with returning JSON and CSV, but it can also return HTML, XM
 
 Focussing on JSON for now, I can give an example data structure that the output should match.
 
-Suppose I have the question:
-
-What is the capital of France?
-1. France
-2. Paris
-3. Lion
-4. London
-
-and I want to create a new question: What is the capital of Germany?
-
-I can pass the structure of the previous question to the API to have the response match that same structure
-
-```json
-{
-    "question": "What is the capital of France?",
-    "options": [
-        "France",
-        "Paris",
-        "Lion",
-        "London"
-    ],
-    "answer": "Paris"
-}
-```
-
 ### API
 I am using the chatGPT API, there might be better APIs out there for this purpose, but the results I get so far work for me
 
 
+### Usage
+To create a new API, you need to extend the Endpoint class, provide a basic description of what the API should return and a data structure, the structure follows the Laravel validation rules
 
-### Api usage
-I am not clear yet on how to pass the data structure
-I want either a toResource method on the Question model, or a WrapperQuestion class in which the structure and output is defined
+```php
+class QuestionEndpoint extends Endpoint
+{
+    protected string $plural = 'questions';
+    
+    protected string $apiDescription = 'This API is specialized in generating questions about Dutch history written in Dutch';
+    
+    protected array $showStructure = [
+        'title' => 'string|max:100',
+        'description' => 'nullable|string|min:100|max:500',
+        'difficulty' => 'enum(easy,medium,hard)',
+        'options' => [
+            [
+                'title' => 'string|max:30',
+                'is_correct' => 'boolean',
+            ],
+        ],
+    ];
+    
+    protected array  $listStructure = [
+        'title' => 'string|max:100',
+    ];
+}
+```
 
+#### Use the list method
+```php
+$endpoint = new QuestionEndpoint();
+$questions = $endpoint->list(50);
+```
+
+#### Use the show method
+```php
+$endpoint = new QuestionEndpoint();
+$question = $endpoint->show();
+```
+
+### Limitations
+The API output is cut off around 1000 characters, also your request might time out, because it is generated on the fly and will take much longer
+
+#### Reducing the response size
+- Reduce number of items in the list
+- Reduce fields in data structure
+- Split large bodies of text into more Endpoints, like a separate QuestionDescriptionEndpoint

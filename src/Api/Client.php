@@ -3,10 +3,11 @@
 namespace Bnoordsij\ChatgptApi\Api;
 
 use Bnoordsij\ChatgptApi\Contracts\Api\Client as ClientInterface;
-use Bnoordsij\ChatgptApi\Exceptions\InvalidOutputException;
+use Bnoordsij\ChatgptApi\Exceptions\InvalidResponseException;
 use Bnoordsij\ChatgptApi\Exceptions\InvalidRequestException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 final class Client implements ClientInterface
 {
@@ -35,6 +36,31 @@ final class Client implements ClientInterface
         return $this->getConversation($messages);
     }
 
+
+    public function getPaginatedConversation(string $query, int $page = 1)
+    {
+        $cacheKey = md5(Str::slug($query));
+        $messages = cache()->get($cacheKey) ?? [];
+        if (!$messages) {
+            $messages = [
+                ['role' => 'user', 'content' => $query],
+            ];
+        } else {
+            $output = collect($messages)->where('role', 'assistant')->shift($page)->last()['content'] ?? null;
+        }
+        $data = [
+            'model' => 'gpt-3.5-turbo',
+            'messages' => $messages,
+        ];
+
+        $output = $this->call('chat/completions', $data)[0]['message']['content'] ?? null;
+
+        // store response, to be used in paginated request
+        // cache should be long enough
+
+        return $output;
+    }
+
     /*
      * @param array $messages
      * [
@@ -48,6 +74,7 @@ final class Client implements ClientInterface
             'model' => 'gpt-3.5-turbo',
             'messages' => $messages,
         ];
+        // store response, to be used in paginated request
 
         return $this->call('chat/completions', $data)[0]['message']['content'] ?? null;
     }
@@ -89,6 +116,6 @@ final class Client implements ClientInterface
             throw new InvalidRequestException('Error: ' . json_encode($json));
         }
 
-        return $json['choices'] ?? throw new InvalidOutputException('Error: ' . json_encode($json));;
+        return $json['choices'] ?? throw InvalidResponseException::withBody(json_encode($json));
     }
 }
