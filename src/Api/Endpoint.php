@@ -19,7 +19,7 @@ class Endpoint implements EndpointContract
 
     protected int $defaultNumber = 10;
     protected string $plural = '';
-    protected string $apiDescription = '';
+    protected string $apiDescription = 'This API has a vast data source and provides accurate information';
     protected array $showStructure = [
         'title' => 'string|min:3|max:255',
     ];
@@ -27,14 +27,30 @@ class Endpoint implements EndpointContract
         'title' => 'string|min:3|max:255',
     ];
 
-    public function list(int $number = 0)
+    protected array $output = [];
+
+    public function listAboutSubject(int $number = 0, string $subject): array
     {
-        return $this->getContent($this->buildListMessages($number));
+        $query = 'about subject: ' . $subject; // this is not rocket science
+
+        return $this->list($number, $query);
     }
 
-    public function show(string $title = '')
+    public function list(int $number = 0, string $query = ''): array
     {
-        return $this->getContent($this->buildShowMessages($title));
+        return $this->getContent($this->buildListMessages($number, $query));
+    }
+
+    public function showByTitle(string $title)
+    {
+        $query = 'with title "' . $title . '"'; // this is not rocket science
+
+        return $this->show($query);
+    }
+
+    public function show(string $query = '')
+    {
+        return $this->getContent($this->buildShowMessages($query));
     }
 
     private function getContent(array $messages)
@@ -44,16 +60,16 @@ class Endpoint implements EndpointContract
         return (new ExtractJson())->extractContent($response);
     }
 
-    private function buildShowMessages(string $title = '')
+    private function buildShowMessages(string $query = '')
     {
         if (empty($this->showStructure)) {
             throw InvalidRequestException::emptyDataStructure();
         }
 
-        return $this->buildMessages($this->showStructure, 1, $title);
+        return $this->buildMessages($this->showStructure, 1, $query);
     }
 
-    private function buildListMessages(int $number = 0)
+    private function buildListMessages(int $number = 0, string $query = '')
     {
         if ($number <= 0 || $number > 100) {
             $number = $this->defaultNumber;
@@ -62,19 +78,16 @@ class Endpoint implements EndpointContract
             throw InvalidRequestException::emptyDataStructure();
         }
 
-        return $this->buildMessages([$this->listStructure], $number);
+        return $this->buildMessages([$this->listStructure], $number, $query);
     }
 
-    private function buildMessages(array $structure, int $number = 1, string $title = '')
+    private function buildMessages(array $structure, int $number = 1, string $query = '')
     {
         if ($number <= 0 || $number > 100) {
             throw InvalidRequestException::invalidNumber();
         }
-        if ($title) {
-            $title = ' with title "' . $title . '"';
-        }
         $subject = (($number === 1) ? Str::singular($this->plural) : $this->plural);
-        $query = 'Give me ' . $number . ' ' . $subject . $title;
+        $query = 'Give me ' . $number . ' ' . $subject . $query;
 
         if (empty($structure)) {
             throw InvalidRequestException::emptyDataStructure();

@@ -4,7 +4,11 @@ namespace Bnoordsij\ChatgptApi\Contracts\Api;
 
 interface Endpoint
 {
-    public function list(int $number = 0);
+    public function listAboutSubject(int $number = 0, string $subject): array;
 
-    public function show(string $title = '');
+    public function list(int $number = 0, string $query = ''): array;
+
+    public function showByTitle(string $title);
+
+    public function show(string $query = '');
 }

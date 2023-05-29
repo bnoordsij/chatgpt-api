@@ -9,6 +9,7 @@ class ExtractJson extends AbstractExtractData
 {
     public function extractContent(string $response): array|string|null
     {
+        logger($response);
         $body = $this->extractBody($response);
 
         // check valid json
