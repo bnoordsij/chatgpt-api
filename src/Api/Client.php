@@ -107,7 +107,6 @@ final class Client implements ClientInterface
         $response = Http::withHeaders($headers)->post($url, $data);
 
         $json = $response->json();
-        dump(['$json', $json]);
 
         if (isset($json['error'])) {
             if (isset($json['error']['message'])) {
